@@ -4,7 +4,7 @@ ifneq (,$(wildcard .env))
 endif
 
 MIGRATIONS_DIR ?= ./migrations
-DATABASE_URL := postgres://$(DATABASE_USER):$(DATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(DATABASE_NAME)?sslmode=$(SSL_MODE)
+DATABASE_URL := postgres://$(DATABASE_USER):$(DATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(DATABASE_NAME)?sslmode=disable
 PG_CONTAINER_NAME := postgres-dev
 TEST_DB_URL := postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable
 

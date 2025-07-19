@@ -1,6 +1,10 @@
 package router
 
 import (
+	"subscriptions/internal/handler"
+	"subscriptions/internal/repository"
+	"subscriptions/internal/service"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"log/slog"
@@ -10,13 +14,13 @@ func SetupRouter(db *pgxpool.Pool, logger *slog.Logger) *gin.Engine {
 	router := gin.Default()
 
 	// repo
-
+	subRepo := repository.NewSubRepository(db, logger)
 	// service
+	subService := service.NewSubService(subRepo, logger)
+	// handler
+	subHandler := handler.NewSubHandler(subService, logger)
 
-	// repo
-
-	// open routes
-	//router.POST("/register", authHandler.HandleRegister)
+	router.POST("/create", subHandler.HandlerCreateSub)
 
 	logger.Info("Endpoints registered")
 	return router
