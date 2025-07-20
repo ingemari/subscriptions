@@ -12,7 +12,7 @@ import (
 )
 
 type SubService interface {
-	CreateSub(ctx context.Context, c *gin.Context)
+	CreateSub(ctx context.Context, sub model.Subscription) (model.Subscription, error)
 }
 
 type SubHandler struct {
@@ -28,22 +28,26 @@ func (h *SubHandler) HandlerCreateSub(c *gin.Context) {
 	var req dto.SubReq
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		h.logger.Error("Invalid request body")
-		c.JSON(http.StatusBadRequest, "Invalid request body")
+		h.logger.Warn("Failed to bind request", slog.Any("err", err))
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	pvz := mapper.CreateProductReqToPvz(req)
-	product := mapper.CreateProductReqToProduct(req)
-
-	result, err := h.productService.CreateProduct(c.Request.Context(), product, pvz)
+	sub, err := mapper.CreateReqToModel(req)
 	if err != nil {
-		h.logger.Error("Failed to create product", "err", err)
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Message: "Failed to create product"})
+		h.logger.Warn("Failed to map request to model", slog.Any("err", err))
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	//resp := mapper.ProductToCreateProductResp(result)
+	sub, err = h.subService.CreateSub(c.Request.Context(), sub)
+	if err != nil {
+		h.logger.Error("Failed to create subscription", slog.Any("err", err))
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
-	//c.JSON(http.StatusCreated, resp)
+	resp := mapper.ModelToResp(sub)
+
+	c.JSON(http.StatusCreated, resp)
 }
