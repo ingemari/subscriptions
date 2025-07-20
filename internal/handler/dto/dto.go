@@ -14,3 +14,16 @@ type SubResp struct {
 	UserID      string `json:"user_id"`
 	StartDate   string `json:"start_date"`
 }
+
+type UpdatePriceRequest struct {
+	Price int `json:"price"`
+}
+
+type UpdateResp struct {
+	ID          string `json:"id"`
+	ServiceName string `json:"service_name"`
+	Price       string `json:"price"`
+	UserID      string `json:"user_id"`
+	StartDate   string `json:"start_date"`
+	UpdatedAt   string `json:"updated_at"`
+}

@@ -37,3 +37,51 @@ func (r *SubRepository) CreateSub(ctx context.Context, sub model.Subscription) (
 
 	return sub, nil
 }
+
+func (r *SubRepository) GetByID(ctx context.Context, id int) (model.Subscription, error) {
+	var ent entities.Subscription
+	ent.ID = id
+
+	query := `
+		SELECT user_id, price, service_name, start_date
+		FROM subscriptions
+		WHERE id = $1
+	`
+
+	err := r.db.QueryRow(ctx, query, ent.ID).Scan(&ent.UserID, &ent.Price, &ent.ServiceName, &ent.StartDate)
+	if err != nil {
+		r.logger.Error("Failed to find subscription in repo layer", slog.Any("err", err))
+		return model.Subscription{}, err
+	}
+
+	sub := entities.EntityToModel(ent)
+
+	return sub, nil
+}
+
+func (r *SubRepository) UpdateSubPrice(ctx context.Context, sub model.Subscription) (model.Subscription, error) {
+	query := `
+		UPDATE subscriptions
+		SET price = $1, updated_at = CURRENT_TIMESTAMP
+		WHERE id = $2
+		RETURNING user_id, service_name, start_date, updated_at
+	`
+
+	var ent entities.Subscription
+	ent.ID = sub.ID
+	ent.Price = sub.Price
+
+	err := r.db.QueryRow(ctx, query, ent.Price, ent.ID).Scan(
+		&ent.UserID,
+		&ent.ServiceName,
+		&ent.StartDate,
+		&ent.UpdatedAt,
+	)
+	if err != nil {
+		r.logger.Error("Failed to change subscription in repo layer", slog.Any("err", err))
+		return model.Subscription{}, err
+	}
+
+	sub = entities.EntityToModel(ent)
+	return sub, nil
+}

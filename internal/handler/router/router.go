@@ -20,7 +20,9 @@ func SetupRouter(db *pgxpool.Pool, logger *slog.Logger) *gin.Engine {
 	// handler
 	subHandler := handler.NewSubHandler(subService, logger)
 
-	router.POST("/create", subHandler.HandlerCreateSub)
+	router.POST("/subscriptions", subHandler.HandlerCreateSub)
+	router.GET("/subscriptions/:id", subHandler.HandlerGetSubs)
+	router.PUT("/subscriptions/:id", subHandler.HandlerUpdateSubPrice)
 
 	logger.Info("Endpoints registered")
 	return router
