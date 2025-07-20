@@ -1,0 +1,260 @@
+openapi: 3.0.0
+info:
+  title: Subscription API
+  version: 1.0
+  description: API для управления подписками
+
+paths:
+  /subscriptions:
+    post:
+      summary: Создать подписку
+      tags: [subscriptions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubReq'
+      responses:
+        '201':
+          description: Успешно создано
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '400':
+          description: Невалидный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      summary: Получить подписки по пользователю
+      tags: [subscriptions]
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Subscription'
+        '400':
+          description: Невалидный UUID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /subscriptions/{id}:
+    get:
+      summary: Получить подписку по ID
+      tags: [subscriptions]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '400':
+          description: Неверный ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      summary: Обновить цену подписки
+      tags: [subscriptions]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePriceRequest'
+      responses:
+        '200':
+          description: Успешно обновлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '400':
+          description: Неверный ID или тело запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      summary: Удалить подписку
+      tags: [subscriptions]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Успешно удалено
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Неверный ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /subscriptions/sum:
+    get:
+      summary: Получить сумму подписок за период
+      tags: [subscriptions]
+      parameters:
+        - name: start_date_from
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "2025-06"
+        - name: start_date_to
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "2025-07"
+      responses:
+        '200':
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sum:
+                    type: integer
+        '400':
+          description: Ошибка валидации дат
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    SubReq:
+      type: object
+      required:
+        - service_name
+        - price
+        - user_id
+        - start_date
+      properties:
+        service_name:
+          type: string
+        price:
+          type: integer
+        user_id:
+          type: string
+          format: uuid
+        start_date:
+          type: string
+          format: date
+
+    UpdatePriceRequest:
+      type: object
+      required:
+        - price
+      properties:
+        price:
+          type: integer
+
+    Subscription:
+      type: object
+      properties:
+        ID:
+          type: integer
+        ServiceName:
+          type: string
+        Price:
+          type: integer
+        UserID:
+          type: string
+        StartDate:
+          type: string
+          format: date
+        CreatedAt:
+          type: string
+          format: date-time
+        UpdatedAt:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string

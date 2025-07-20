@@ -31,6 +31,22 @@ func NewSubHandler(as SubService, logger *slog.Logger) *SubHandler {
 	return &SubHandler{subService: as, logger: logger}
 }
 
+// ErrorResponse describes an error message
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
+// HandlerCreateSub godoc
+// @Summary Создать подписку
+// @Description Создаёт новую подписку
+// @Tags subscriptions
+// @Accept json
+// @Produce json
+// @Param subscription body dto.SubReq true "Подписка"
+// @Success 201 {object} model.Subscription
+// @Failure 400 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /subscriptions [post]
 func (h *SubHandler) HandlerCreateSub(c *gin.Context) {
 	var req dto.SubReq
 
@@ -59,6 +75,16 @@ func (h *SubHandler) HandlerCreateSub(c *gin.Context) {
 	c.JSON(http.StatusCreated, resp)
 }
 
+// HandlerGetSubs godoc
+// @Summary Получить подписку по ID
+// @Description Возвращает подписку по идентификатору
+// @Tags subscriptions
+// @Produce json
+// @Param id path int true "ID подписки"
+// @Success 200 {object} model.Subscription
+// @Failure 400 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /subscriptions/{id} [get]
 func (h *SubHandler) HandlerGetSubs(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -82,6 +108,18 @@ func (h *SubHandler) HandlerGetSubs(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+// HandlerUpdateSubPrice godoc
+// @Summary Обновить цену подписки
+// @Description Обновляет цену подписки по ID
+// @Tags subscriptions
+// @Accept json
+// @Produce json
+// @Param id path int true "ID подписки"
+// @Param price body dto.UpdatePriceRequest true "Новая цена"
+// @Success 200 {object} model.Subscription
+// @Failure 400 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /subscriptions/{id} [put]
 func (h *SubHandler) HandlerUpdateSubPrice(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -114,6 +152,16 @@ func (h *SubHandler) HandlerUpdateSubPrice(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+// HandlerDeleteSub godoc
+// @Summary Удалить подписку
+// @Description Удаляет подписку по ID
+// @Tags subscriptions
+// @Produce json
+// @Param id path int true "ID подписки"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /subscriptions/{id} [delete]
 func (h *SubHandler) HandlerDeleteSub(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -132,6 +180,16 @@ func (h *SubHandler) HandlerDeleteSub(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "subscription deleted"})
 }
 
+// HandlerListSubs godoc
+// @Summary Список подписок
+// @Description Возвращает список подписок по user_id
+// @Tags subscriptions
+// @Produce json
+// @Param user_id query string true "UUID пользователя"
+// @Success 200 {array} model.Subscription
+// @Failure 400 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /subscriptions [get]
 func (h *SubHandler) HandlerListSubs(c *gin.Context) {
 	var req dto.ListReq
 	req.UserID = c.Query("user_id")
@@ -153,6 +211,17 @@ func (h *SubHandler) HandlerListSubs(c *gin.Context) {
 	c.JSON(http.StatusOK, subs)
 }
 
+// HandlerSumSubs godoc
+// @Summary Сумма подписок
+// @Description Возвращает сумму подписок за период
+// @Tags subscriptions
+// @Produce json
+// @Param start_date_from query string true "Дата начала (MM-YYYY)"
+// @Param start_date_to query string true "Дата окончания (MM-YYYY)"
+// @Success 200 {object} map[string]int
+// @Failure 400 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /subscriptions/sum [get]
 func (h *SubHandler) HandlerSumSubs(c *gin.Context) {
 	var req dto.SumReq
 	if err := c.ShouldBindQuery(&req); err != nil {

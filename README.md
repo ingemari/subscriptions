@@ -1,11 +1,13 @@
 # subscriptions
 
-## Пример запроса создания /create
+Реализованы ручки на создание, удаление, изменение цены подписки. Так же их получение по id и списка подписок по user_id.
+Документация swagger в cmd/app/docs
 
-{
-"service_name": "Yandex Plus",
-"price": 400,
-"user_id": "60601fee-2bf1-4721-ae6f-7636e79a0cba",
-"start_date": "07-2025"
-}
+Миграции в /migrations `make migrate_up`
 
+Код покрыт логами
+
+Конфигурационный файл .env запушен специально для наглядности
+
+Запуск сервиса с помощью docker compose
+docker-compose up --build // Конфликтует с версией 1.23
