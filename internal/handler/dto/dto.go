@@ -27,3 +27,12 @@ type UpdateResp struct {
 	StartDate   string `json:"start_date"`
 	UpdatedAt   string `json:"updated_at"`
 }
+
+type ListReq struct {
+	UserID string `json:"user_id"`
+}
+
+type SumReq struct {
+	StartDateFrom string `form:"start_date_from"`
+	StartDateTo   string `form:"start_date_to"`
+}

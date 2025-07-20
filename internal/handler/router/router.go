@@ -23,6 +23,9 @@ func SetupRouter(db *pgxpool.Pool, logger *slog.Logger) *gin.Engine {
 	router.POST("/subscriptions", subHandler.HandlerCreateSub)
 	router.GET("/subscriptions/:id", subHandler.HandlerGetSubs)
 	router.PUT("/subscriptions/:id", subHandler.HandlerUpdateSubPrice)
+	router.DELETE("/subscriptions/:id", subHandler.HandlerDeleteSub)
+	router.GET("/subscriptions", subHandler.HandlerListSubs)
+	router.GET("/subscriptions/sum", subHandler.HandlerSumSubs)
 
 	logger.Info("Endpoints registered")
 	return router

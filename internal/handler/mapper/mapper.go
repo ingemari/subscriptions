@@ -16,7 +16,7 @@ func CreateReqToModel(req dto.SubReq) (model.Subscription, error) {
 		return model.Subscription{}, fmt.Errorf("invalid user_id: %w", err)
 	}
 
-	startDate, err := parseMonthYear(req.StartDate)
+	startDate, err := ParseMonthYear(req.StartDate)
 	if err != nil {
 		return model.Subscription{}, fmt.Errorf("invalid start_date: %w", err)
 	}
@@ -39,7 +39,7 @@ func ModelToResp(sub model.Subscription) dto.SubResp {
 	}
 }
 
-func parseMonthYear(input string) (time.Time, error) {
+func ParseMonthYear(input string) (time.Time, error) {
 	full := "01-" + input
 	return time.Parse("02-01-2006", full)
 }
@@ -60,4 +60,15 @@ func ModelToUpdatePriceResp(sub model.Subscription) dto.UpdateResp {
 		StartDate:   sub.StartDate.Format("01-2006"),
 		UpdatedAt:   sub.UpdatedAt.Format("2006-01-02 15:04:05"),
 	}
+}
+
+func ListReqToModel(req dto.ListReq) (model.Subscription, error) {
+	if req.UserID == "" {
+		return model.Subscription{UserID: uuid.Nil}, nil
+	}
+	userID, err := uuid.Parse(req.UserID)
+	if err != nil {
+		return model.Subscription{}, fmt.Errorf("invalid user_id: %w", err)
+	}
+	return model.Subscription{UserID: userID}, nil
 }
